@@ -66,7 +66,6 @@ package com.mygame.views
 bean数组可以是一堆对象，也可以是单个。他们可以是任意类型。
 
 ###Flash Builder需要额外设置的环境
-When exporting release builds using Flash Builder, the ActionScript compiler will strip out non-standard metadata unless it is instructed otherwise. StarlingMVC's custom metadata is required in order for powerful features such as automatic dependency injection (DI) to work correctly and so the removal of the metadata can effectively render your application useless.
 
 当用Flash builder编译的时候，ActionScript编译器会清理未声明的关键字。StarlingMVC需要定制化几个关键字来实现一些比较强大的特性，如依赖注入。所以你需要额外声明一下关键字。
 
@@ -123,11 +122,6 @@ package com.mygame.config
 		}
 	}
 }
-```
-建议使用BeanProvider，这样你比较好组织自己的代码。
-
-```as3
-var beans:Array = [new Models(), new ViewManager(this)];
 ```
 
 ###ProtoBeans
@@ -250,9 +244,10 @@ package com.mygame.controllers
 	}
 }
 ```
-Binding is connected directly to the Starling juggler instance and will check for changes on each bound property everytime the `advanceTime()` method is called. This does not provide a binding that works as instantaneously as Flex binding. Binding should be used sparingly as there is still overhead to check for changes to the bound properties.
+绑定实际上是在Starling juggler中生效的，在每次调用`advanceTime()`的时候回检查并更新。它的机制不是像Flex的绑定一样即时更新。所以绑定实际上和代码中比如碰撞检测一样，都是每帧来执行的，你需要知道这个原理，谨慎使用。
 
-As an alternative to auto bound properties, StarlingMVC supports binding through invalidation. This method is much more efficient than the auto bound properties because it give you much more control over when properties are updated. This is done through an injected `Bindings` class and the optional "auto" parameter.
+StarlingMVC也提供方法支持绑定的立即生效，这比自动绑定要实用，因为开发者将对更新的变量有更强的掌控力。你可以通过注入一个`Bindings`类，并且设置"auto"参数。
+
 ```as3
 package com.mygame.controllers
 {
