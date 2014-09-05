@@ -1,32 +1,37 @@
 StarlingMVC Framework
 ===========
 
-StarlingMVC is an IOC framework for use in games built using the great [Starling framework](http://gamua.com/starling/). Closely modelled after established IOC frameworks like [Swiz](http://swizframework.org/) and [RobotLegs](http://www.robotlegs.org/), StarlingMVC features:
-* Dependency Injection(DI)/Inversion of Control(IOC)
-* View Mediation
-* Event Handling
-* Stays out of the way of your Starling game code
-* Simple configuration
-* Easily extended
-* More utilities to help with your game code
+译者注
+-----------
+此文由[Luke Cheng](mailto:chengogng8@gmail.com)翻译，对应StarlingMVC原版，请访问其原github: https://github.com/CreativeBottle/starlingMVC。
+我没有按照原文严格翻译，在翻译过程中，我增加了一些自己的注释。建议大家有条件的话，还是阅读原文。
 
-StarlingMVC Framework is provided under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+StarlingMVC Framework===========
+StaringMVC是一个使用[Starling](http://gamua.com/starling/)构建的游戏IOC框架，它和[Swiz](http://swizframework.org/)和[RobotLegs](http://www.robotlegs.org/)类似。有以下特性：
 
-Requirements
+* 依赖注入(DI)/控制反转(IOC)
+* 视图仲裁(View Mediation)* 事件处理
+* 不影响原生的Starling游戏代码
+* 简易配置
+* 易扩展
+* 提供一些实用工具
+
+StarlingMVC框架使用[Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)开源授权
+
+环境依赖
 ------------
 * [Flex SDK 4.6](http://www.adobe.com/devnet/flex/flex-sdk-download.html)
 * [Starling 1.1](http://gamua.com/starling/)
 * [FlexUnit 4.1 (For running the unit tests)](http://www.flexunit.org/)
 
-Contributors
+贡献者
 ------------
 * [Creative Bottle, Inc](http://www.creativebottle.com)
 * [Scott Jeppesen](mailto:scott.jeppesen@creativebottle.com)
 * [Tom McAvoy](mailto:tom.mcavoy@creativebottle.com)
 
-Setup
-------------
-Getting your Starling project configured to work with StarlingMVC requires only a few lines of code. From your base Starling display class (starling.display.*), you need to create an instance of StarlingMVC and provide it the root Starling display object, an instance of StarlingMVCConfig, and some Beans.
+环境集成
+------------只需要简单的几行就可以集成Starling。你需要实例化StringMVC类（这是基本的Starling显示类），提供给它用于starling显示的根对象、StarlingMVCConfig对象实例、还有一些你游戏中需要使用的bean。
 
 ```as3
 package com.mygame.views
@@ -57,15 +62,17 @@ package com.mygame.views
 }
 ```
 
-The StarlingMVCConfig instance above tells StarlingMVC which event packages and view packages it should mediate.
-The beans Array is merely a collection of objects. The array can accept an object of any type. The framework will handle it accordingly.
+如上代码，StarlingMVCConfig对象会告诉StarlingMVC它所需要管理的event和view分别在哪些包里。
+bean数组可以是一堆对象，也可以是单个。他们可以是任意类型。
 
-###Additional setup steps for Flash Builder
+###Flash Builder需要额外设置的环境
 When exporting release builds using Flash Builder, the ActionScript compiler will strip out non-standard metadata unless it is instructed otherwise. StarlingMVC's custom metadata is required in order for powerful features such as automatic dependency injection (DI) to work correctly and so the removal of the metadata can effectively render your application useless.
 
-Preventing the removal (or "stripping") of StarlingMVC's custom metadata is simple and just requires some additional compiler arguments to be set for your project.
+当用Flash builder编译的时候，ActionScript编译器会清理未声明的关键字。StarlingMVC需要定制化几个关键字来实现一些比较强大的特性，如依赖注入。所以你需要额外声明一下关键字。
 
-To add the additional compiler arguments, right-click your project and click Properties. Next go to "ActionScript Compiler" and under "Additional compiler arguments" add the following:
+声明关键字的方法是在你的工程上设置编译选项。
+
+右键点击工程-属性-ActionScript编译，在附加编译参数里增加以下内容：
 ```
 -keep-as3-metadata+=Dispatcher
 -keep-as3-metadata+=EventHandler
@@ -75,28 +82,31 @@ To add the additional compiler arguments, right-click your project and click Pro
 -keep-as3-metadata+=ViewAdded
 -keep-as3-metadata+=ViewRemoved
 ```
-You will now be able to export release builds and StarlingMVC will function as expected.
 
 Beans
 ------------
-A Bean is an instance of an object that is provided to StarlingMVC to manage. Beans can be injected, receive injections, and handle events. There are several ways that beans can be provided to StarlingMVC during setup:
-###Object instance
+Bean就是需要StarlingMVC托管的对象，Bean可以注入、被注入、处理事件。有以下几种初始化Bean的方式：
+
+###直接实例化对象
 ```as3
 var beans:Array = [new GameModel(), new ViewManager(this)];
 ```
 
 
-###Bean instances
+###实例化Bean
 ```as3
 var beans:Array = [new Bean(new GameModel()), new Bean(new ViewManager(this))];
 ```
-Providing a Bean instance as shown above does not give much benefit. However, there is an option second parameter to thw Bean constructor that allows for an id. If you provide an id then you can use the id during dependency injection. Additionally, beans are stored within the framework by class type unless you provide an id. So if you have two beans of the same type you will need to specify an id or subsequent beans will overwrite the previous beans. For example:
+
+提供Bean实例的方式和上面基本类似，但是这种方式可以让你指定一个id，这样就你可以在依赖注入的时候使用这个id了。另外，bean在starlingMVC中是按类保存的，如果你有两个bean是同样的类，你必须用id区分它们。例如：
+
 ```as3
 var beans:Array = [new Bean(new GameModel(),"gameModelEasy"),new Bean(new GameModel(),"gameModelHard"), new ViewManager(this)];
 ```
 
-###BeanProvider instances
-A BeanProvider is a collection of Beans. The beans within the provider, like with a simple array, can be of any type, including BeanProvider.
+###使用BeanProvider
+BeanProvider提供bean的集合，provider中有一个beans的数组，可以装填任何类型数据，甚至包括再包含另一个BeanProvider
+
 ```as3
 package com.mygame.config
 {
@@ -114,21 +124,23 @@ package com.mygame.config
 	}
 }
 ```
-Once you have your BeanProvider set up, you can pass that as a part of your original beans array.
+建议使用BeanProvider，这样你比较好组织自己的代码。
+
 ```as3
 var beans:Array = [new Models(), new ViewManager(this)];
 ```
 
 ###ProtoBeans
-A ProtoBean is a bean that is created at the time of injection. Where normal beans require a class instance, a ProtoBean requires a class and an id.
+ProtoBean是另一种方式，它在注入的时候实例化。不像其他bean是提供一个对象，这里你需要提供的是类型和id。
+
 ```as3
 var beans:Array = [new ProtoBean(Character,"character"), new ViewManager(this)];
 ```
-Using a ProtoBean here will allow StarlingMVC to create the instances of this class for you. Each time it is injected, it will be a new instance of the, in this case, "Character" class instead of using a singleton like a normal Bean. The advantage to allowing the framework to create the class over just using "new Character()" is that when StarlingMVC creates the instance it will run injection and all processing on the created instance.
+使用ProtoBean，StarlingMVC会替你来进行实例化。每次它被注入的时候，都会生成一个新的实例。在上面代码中，"Character"类不再是像普通bean一样使用单例模式。比起你自己直接在代码里"new Character()"的形式，这种方式的优点是StarlingMVC可以帮你完成Charcter内部的依赖注入。
 
-Dependency Injection
+依赖注入（Dependency Injection）
 ------------
-Dependency injection occurs on all beans and all Starling display objects. A dependency is denoted with an `Inject` metadata tag over a public property or getter/setter. Injection can be done by type:
+可以在所有的bean上或Starling的显示对象（display objects）上使用依赖注入。依赖注入的方式是在public属性或getter/setter上使用"Inject"注解。如：
 ```as3
 package com.mygame.controllers
 {
@@ -144,7 +156,7 @@ package com.mygame.controllers
 	}
 }
 ```
-or by id, if an id was specified when the bean was created:
+或者使用id：
 ```as3
 package com.mygame.controllers
 {
@@ -160,9 +172,10 @@ package com.mygame.controllers
 	}
 }
 ```
-In the above example, if the GameModel is a normal bean, the framework will set the value to the singleton instance that was created during setup. If it was a protobean, a new instance will be created and injected into the property.
+在上面的例子中，如果GameModel是一个bean，StarlingMVC会在框架初始化的时候，将它的单例实例化。如果是一个protobean，则会在注入的时候实例化。
 
-Starling also supports injecting properties of beans. In order to use this functionality, the source Bean must contain an id (i.e. `new Bean(new GameModel(),"gameModel");`). To inject a property of a bean, simply append the property name to the end of the id parameter in your Inject tag:
+Starling还支持注入bean中的变量。这种方式要求bean必须构造的时候指定id(如 `new Bean(new GameModel(),"gameModel");`)。注入bean中的变量这么写：
+
 ```as3
 package com.mygame.controllers
 {
@@ -181,10 +194,13 @@ package com.mygame.controllers
 	}
 }
 ```
-In the example above, the value of the `currentUser` property on the `userModel` bean would be injected into the currentUser property of our controller. This functionality is also recursive. If you wanted to inject the first name of the currentUser you could potentially use `[Inject(source="userModel.currentUser.firstName")]`.
 
-###Binding
-The InjectProcessor also supports a very simple binding mechanism that will cause injected properties to be automatically refreshed when they are changed.
+在上面的例子中，`userModel`的`currentUser`会被注入到这个controller中。StarlingMVC支持多层次的属性注入，比如你还可以这么用：`[Inject(source="userModel.currentUser.firstName")]`
+
+###绑定(Binding)
+
+StarlingMVC还支持绑定模式，这样在每次更新的时候将会自动刷新注入。
+
 ```as3
 package com.mygame.controllers
 {
@@ -203,7 +219,8 @@ package com.mygame.controllers
 	}
 }
 ```
-The example above uses the optional `bind="true"` parameter of the `[Inject]` tag to create a binding.  When the currentUser property of the userModel is updated StarlingMVC will automatically update any injections using binding. This will also work with getter/setters methods. Using these will allow code to easily react to changes in the properties.
+设置Inject注解中的 bind="true"来进行绑定，当userModel的currentUser更新的时候，StarlingMVC将自动的对绑定的注入进行更新。同时你也可以绑定到getter/setter方法，这样就可以很优雅的处理属性的改变带来的游戏中的展示/逻辑变化：
+
 ```as3
 package com.mygame.controllers
 {
